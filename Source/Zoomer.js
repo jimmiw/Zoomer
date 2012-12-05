@@ -44,20 +44,27 @@ var Zoomer = new Class({
 				
 		if (typeof src == 'string') {
 			this.big = new Element('img', {
-				src: src,
-				styles: styles
+				styles: styles,
+				// always adds the load event when using string src
+				events: {
+					load: function() {
+						this.prepareBig();
+					}.bind(this)
+				}
 			});
+			// fixes an IE8 bug.
+			this.big.set('src', src);
 		} else {
 			this.big = src;
 			this.big.setStyles(styles);
-		}
-		
-		if(!this.big.complete) {
-			this.big.addEvent('load', function() {
+			// moved here, so the events doesn't collide
+			if(!this.big.complete) {
+				this.big.addEvent('load', function() {
+					this.prepareBig();
+				}.bind(this));
+			} else {
 				this.prepareBig();
-			}.bind(this));
-		} else {
-			this.prepareBig();
+			}
 		}
 	},
 	
